@@ -24,24 +24,29 @@ func main() {
 	imgPath := os.Args[1]
 	sdkID := os.Args[2]
 	keyFilePath := os.Args[3]
-	baseURL := "https://api.yoti.com/ai/v1"
-	if len(os.Args) >= 5 {
-		baseURL = os.Args[4]
+	endpoint := os.Args[4]
+
+	baseURL := "https://api.yoti.com/ai/v1" // Prod URL is the default value.
+	if len(os.Args) >= 6 {
+		baseURL = os.Args[5]
 	}
 
 	// Build request.
-	file, _ := ioutil.ReadFile(imgPath)
+	file, err := ioutil.ReadFile(imgPath)
+	checkError(err)
 	b64Img := base64.StdEncoding.EncodeToString(file)
 
-	keyFile, _ := ioutil.ReadFile(keyFilePath)
+	keyFile, err := ioutil.ReadFile(keyFilePath)
+	checkError(err)
 
 	entity := map[string]string{"img": b64Img}
-	reqBody, _ := json.Marshal(entity)
+	reqBody, err := json.Marshal(entity)
+	checkError(err)
 
-	req, _ := requests.SignedRequest{
+	req, err := requests.SignedRequest{
 		HTTPMethod: http.MethodPost,
 		BaseURL:    baseURL,
-		Endpoint:   "/age-antispoofing",
+		Endpoint:   fmt.Sprintf("/%s", endpoint),
 		Headers: map[string][]string{
 			"Content-Type":   {"application/img"},
 			"Accept":         {"application/img"},
@@ -49,16 +54,23 @@ func main() {
 		},
 		Body: reqBody,
 	}.WithPemFile(keyFile).Request()
+	checkError(err)
 
 	// Request the service.
 	res, err := http.DefaultClient.Do(req)
-	if err != nil {
-		fmt.Println(err)
-	}
+	checkError(err)
 
 	// Print result.
 	fmt.Printf("Response status code: %d\n", res.StatusCode)
 	fmt.Println("Body:")
-	resBody, _ := ioutil.ReadAll(res.Body)
+	resBody, err := ioutil.ReadAll(res.Body)
+	checkError(err)
 	fmt.Println(string(resBody))
+}
+
+func checkError(err error) {
+	if err != nil {
+		fmt.Println(err)
+		os.Exit(1)
+	}
 }

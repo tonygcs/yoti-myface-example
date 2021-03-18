@@ -5,19 +5,15 @@ service. Run the following commands:
 
 ```sh
 go mod download
-go run main.go <img_path> <sdk_id> <key_file_path>
+go run main.go <img_path> <sdk_id> <key_file_path> <endpoint> <url>
 ```
 
-This is the output right now:
+## Arguments
 
-```sh
-Response status code: 401
-Body:
-{"error_message": "Failed to verify signature.", "error_code": "INVALID_SIGNATURE"}
-```
-
-We can get a result if we provide the same keys in
-[this](https://github.com/lampkicking/web-fcm-demo) other example.
-
-Tested version 2 and 3 of `yoti-go-sdk` package
-([Guide](https://developers.yoti.com/yoti-myface/integration-guide)).
+- img_path: the path where the image to send is located.
+- sdk_id: the SDK id to request the AI service.
+- key_file_path: the path where the pem file with the key is located.
+- endpoint: the prediction that the client will request (`age`,
+  `age-antispoofing` or `antispoofing`).
+- url: the url where the service is located (the default value is the production
+  environment: `https://api.yoti.com/ai/v1`).
