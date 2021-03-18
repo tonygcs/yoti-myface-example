@@ -10,6 +10,7 @@ package main
 import (
 	"encoding/base64"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io/ioutil"
 	"net/http"
@@ -20,6 +21,10 @@ import (
 )
 
 func main() {
+	if len(os.Args) < 5 {
+		checkError(errors.New("provide all arguments (<img_path> <sdk_id> <key_file_path> <endpoint> <url>)"))
+	}
+
 	// Read sdk ID and key file path from args.
 	imgPath := os.Args[1]
 	sdkID := os.Args[2]
