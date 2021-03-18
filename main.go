@@ -24,6 +24,10 @@ func main() {
 	imgPath := os.Args[1]
 	sdkID := os.Args[2]
 	keyFilePath := os.Args[3]
+	baseURL := "https://api.yoti.com/ai/v1"
+	if len(os.Args) >= 5 {
+		baseURL = os.Args[4]
+	}
 
 	// Build request.
 	file, _ := ioutil.ReadFile(imgPath)
@@ -36,8 +40,8 @@ func main() {
 
 	req, _ := requests.SignedRequest{
 		HTTPMethod: http.MethodPost,
-		BaseURL:    "https://api.yoti.com/ai/v1/",
-		Endpoint:   "age-antispoofing",
+		BaseURL:    baseURL,
+		Endpoint:   "/age-antispoofing",
 		Headers: map[string][]string{
 			"Content-Type":   {"application/img"},
 			"Accept":         {"application/img"},
@@ -47,7 +51,10 @@ func main() {
 	}.WithPemFile(keyFile).Request()
 
 	// Request the service.
-	res, _ := http.DefaultClient.Do(req)
+	res, err := http.DefaultClient.Do(req)
+	if err != nil {
+		fmt.Println(err)
+	}
 
 	// Print result.
 	fmt.Printf("Response status code: %d\n", res.StatusCode)
